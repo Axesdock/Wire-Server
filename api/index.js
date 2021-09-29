@@ -31,6 +31,13 @@ router.get('/devices',function(req,res,next){
 });
 
 
+// Fetch a specific device data
+router.get('/devices/:name',function(req,res,next){
+    Device.findOne({name:req.params.name}).then(function(devices){
+        res.send(devices);
+    }).catch(next);
+});
+
 /*
 Create a new device
 {
