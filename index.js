@@ -1,13 +1,28 @@
-var express = require('express');
-var app = express();
-var port = 8080;
+const express = require('express');
+const api = require('./api')
+var cors = require('cors')
+const mongoose = require('mongoose');
 
-// start the server
-app.listen(port, function() {
-  console.log('app started');
+
+mongoose.connect('mongodb+srv://admin:IW0BGph6eQOZRQLP@cluster0.unq25.mongodb.net/myFirstDatabase?retryWrites=true&w=majority');
+mongoose.Promise = global.Promise;
+
+
+// set up our express app
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+// initialize routes
+app.use('/api',api);
+
+// error handling middleware
+app.use(function(err,req,res,next){
+    //console.log(err);
+    res.status(422).send({error: err.message});
 });
 
-// route our app
-app.get('/', function(req, res) {
-  res.send('hello world!');
+// listen for requests
+app.listen(process.env.port || 4004, function(){
+    console.log('Ready to Go!');
 });
