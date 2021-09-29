@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <title>Hello world</title>
+   </head>
+   <input type='text' id='mac' />
+   <input type="button" onclick="em()">
+
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.js" integrity="sha512-WL6WGKMPBiM9PnHRYIn5YEtq0Z8XP4fkVb4qy7PP4vhmYQErJ/dySyXuFIMDf1eEYCXCrQrMJfkNwKc9gsjTjA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+   
+   <script>
+        
+        var socket = io.connect('http://localhost:4011', {reconnect: true});
+        var mac = undefined;
+        function em(){
+           console.log("click")
+           mac = document.getElementById('mac').value;
+           socket.emit('connect_device',{mac:mac});
+        }
+        socket.on('control',(data)=>{
+           console.log(data);
+        })
+
+   </script>
+   <body>Hello</body>
+</html>
