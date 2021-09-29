@@ -1,0 +1,28 @@
+{
+  "name": "wire-server",
+  "version": "1.0.0",
+  "description": "Server to be installed at IIT B",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Axesdock/Wire-Server.git"
+  },
+  "author": "Abhishek Shingane , Saksham Bhushan",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Axesdock/Wire-Server/issues"
+  },
+  "homepage": "https://github.com/Axesdock/Wire-Server#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "nosql": "^6.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.13"
+  }
+}
