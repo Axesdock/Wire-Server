@@ -353,13 +353,10 @@
                     <th scope="col"></th>
                   </tr>
                 </thead>
-                <tbody class="list">
-                  <tr>
+                <tbody class="device-table list">
+                  <!-- <tr>
                     <th scope="row">
                       <div class="media align-items-center">
-                        <!-- <a href="#" class="avatar rounded-circle mr-3">
-                          <img alt="Image placeholder" src="../assets/img/theme/bootstrap.jpg">
-                        </a> -->
                         <div class="media-body">
                           <span class="name mb-0 text-sm">Argon Design System</span>
                         </div>
@@ -399,9 +396,6 @@
                   <tr>
                     <th scope="row">
                       <div class="media align-items-center">
-                        <!-- <a href="#" class="avatar rounded-circle mr-3">
-                          <img alt="Image placeholder" src="../assets/img/theme/bootstrap.jpg">
-                        </a> -->
                         <div class="media-body">
                           <span class="name mb-0 text-sm">Design System</span>
                         </div>
@@ -441,9 +435,6 @@
                   <tr>
                     <th scope="row">
                       <div class="media align-items-center">
-                        <!-- <a href="#" class="avatar rounded-circle mr-3">
-                          <img alt="Image placeholder" src="../assets/img/theme/bootstrap.jpg">
-                        </a> -->
                         <div class="media-body">
                           <span class="name mb-0 text-sm">Axesdock System</span>
                         </div>
@@ -477,7 +468,7 @@
                         </div>
                       </div>
                     </td>
-                  </tr>
+                  </tr> -->
 
                 </tbody>
               </table>
@@ -533,6 +524,21 @@
       </footer>
     </div>
   </div>
+
+  <script>
+    
+    window.onload = function exampleFunction() {
+      renderDevices();
+      console.log('Rendered');
+      var options = {
+        valueNames: [ 'name', 'macid', 'status', 'ports', 'instadd', 'list-action' ]
+      };
+      
+      var userList = new List('list-devices', options);
+
+    }
+</script>
+
   <!-- Argon Scripts -->
   <script src="./assets/js/list.min.js"></script>
   <script src="./assets/js/custom.js"></script>
