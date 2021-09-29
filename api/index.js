@@ -94,4 +94,25 @@ router.put('/devices/:name',function(req,res,next){
     });
 });
 
+router.get('/stats',function(req,res,next){
+    let notRegistered = 0;
+    let active = 0;
+    let dead  = 0;
+    let total = 0;
+    Device.find({}).then((totalDevices)=>{
+        total=totalDevices.length;
+        Device.find({isRegistered:false}).then((notRegisteredDevices)=>{
+            notRegistered = notRegisteredDevices.length;
+
+            Device.find({status:'LIVE'}).then((activeDevices)=>{
+                active = activeDevices.length;
+                Device.find({status:'DEAD'}).then((deadDevices)=>{
+                    dead = deadDevices.length;
+                    res.send({notRegistered:notRegistered,active:active,dead:dead,total:total});
+                })
+            })
+        })
+    })
+})
+
 module.exports = router;
