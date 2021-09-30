@@ -12,6 +12,7 @@ mongoose.Promise = global.Promise;
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use(express.static('static'))
 
 // Socketio
 const http = require('http').Server(app);
