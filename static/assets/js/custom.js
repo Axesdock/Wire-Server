@@ -23,7 +23,6 @@ async function renderDevices() {
   let html = '';
   let divstatus = ''
   devices.forEach(device => {
-    if(!device.isRegistered) {
       if(device.status == 'LIVE'){
         divstatus =  `  <td>
                             <span class="badge badge-dot mr-4">
@@ -74,7 +73,6 @@ async function renderDevices() {
                             </td>
                           </tr>`;
       html += htmlSegment;
-    }
 
   let container = document.querySelector('.device-table');
   container.innerHTML = html;
@@ -174,5 +172,99 @@ async function editDevice(id) {
 
 // dashboard stats starts
 
+async function getStats() {
+  let url = 'http://localhost:4004/api/stats/';
+  try {
+      let res = await fetch(url);
+      return await res.json();
+  } catch (error) {
+      console.log(error);
+  }
+}
+
+async function renderStats() {
+  let stats = await getStats();
+  let html = '';
+      html = `  <div class="row">
+                  <div class="col-xl-3 col-md-6">
+                    <div class="card card-stats">
+                      <!-- Card body -->
+                      <div class="card-body">
+                        <div class="row">
+                          <div class="col">
+                            <h5 class="card-title text-uppercase text-muted mb-0">Total Devices</h5>
+                            <span class="h2 font-weight-bold mb-0">${stats.total}</span>
+                          </div>
+                          <div class="col-auto">
+                            <div class="icon icon-shape bg-gradient-info text-white rounded-circle shadow">
+                              <i class="ni ni-chart-bar-32"></i>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-xl-3 col-md-6">
+                    <div class="card card-stats">
+                      <!-- Card body -->
+                      <div class="card-body">
+                        <div class="row">
+                          <div class="col">
+                            <h5 class="card-title text-uppercase text-muted mb-0">Active Devices</h5>
+                            <span class="h2 font-weight-bold mb-0">${stats.active}</span>
+                          </div>
+                          <div class="col-auto">
+                            <div class="icon icon-shape bg-gradient-orange text-white rounded-circle shadow">
+                              <i class="ni ni-active-40"></i>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-xl-3 col-md-6">
+                    <div class="card card-stats">
+                      <!-- Card body -->
+                      <div class="card-body">
+                        <div class="row">
+                          <div class="col">
+                            <h5 class="card-title text-uppercase text-muted mb-0">Dead Devices</h5>
+                            <span class="h2 font-weight-bold mb-0">${stats.dead}</span>
+                          </div>
+                          <div class="col-auto">
+                            <div class="icon icon-shape bg-gradient-red text-white rounded-circle shadow">
+                              <i class="ni ni-chart-pie-35"></i>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-xl-3 col-md-6">
+                    <div class="card card-stats">
+                      <!-- Card body -->
+                      <div class="card-body">
+                        <div class="row">
+                          <div class="col">
+                            <h5 class="card-title text-uppercase text-muted mb-0">Unregistered Devices</h5>
+                            <span class="h2 font-weight-bold mb-0">${stats.notRegistered}</span>
+                          </div>
+                          <div class="col-auto">
+                            <div class="icon icon-shape bg-gradient-green text-white rounded-circle shadow">
+                              <i class="ni ni-money-coins"></i>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>`;
+
+  let container = document.querySelector('.stats-render');
+  container.innerHTML = html;
+  // const deviceForm = document.getElementById("newDevice-form");
+  // deviceForm.addEventListener("submit", handleFormSubmit);
+  console.log("Stats Rendered.");
+}
 
 // dashboard stats ends
