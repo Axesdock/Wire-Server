@@ -2,21 +2,29 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 // create student schema & model
-const UserSchema = new Schema({
-    username: {
+const DeviceSchema = new Schema({
+    name: {
         type: String,
     },
-    name:{
+    mac:{
         type:String,
     },
-    password:{
-        type: String,
+    installAddress:{
+        type:String,
     },
-    email:String,
-    token:String,
+    ports:[{
+        id:Number,
+        comment:String,
+        status:String
+    }],
+    status:String,
+    isRegistered:Boolean,
+    lastConnected: Date,
+    lastDisconnected: Date,
+    comment:String
 });
 
 
-const User = mongoose.model('user',UserSchema);
+const Device = mongoose.model('device',DeviceSchema);
 
-module.exports = User;
+module.exports = Device;
