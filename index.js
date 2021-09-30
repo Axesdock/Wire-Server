@@ -73,6 +73,28 @@ io.sockets.on('connection', function(socket) {
 // initialize routes
 app.use('/api/devices',devices);
 app.use('/api/auth',auth);
+app.get('/api/stats',function(req,res,next){
+    let notRegistered = 0;
+    let active = 0;
+    let dead  = 0;
+    let total = 0;
+    console.log("stats")
+    Device.find({}).then((totalDevices)=>{
+        total=totalDevices.length;
+        Device.find({isRegistered:false}).then((notRegisteredDevices)=>{
+            notRegistered = notRegisteredDevices.length;
+
+            Device.find({status:'LIVE'}).then((activeDevices)=>{
+                active = activeDevices.length;
+                Device.find({status:'DEAD'}).then((deadDevices)=>{
+                    dead = deadDevices.length;
+                    res.send({notRegistered:notRegistered,active:active,dead:dead,total:total});
+                })
+            })
+        })
+    })
+})
+
 // API to control the device
 app.post('/control', (req,res)=>{
     var {name,port,command} = req.body;
