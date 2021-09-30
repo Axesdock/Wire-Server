@@ -1,9 +1,9 @@
 const express = require('express');
-const api = require('./api')
 var cors = require('cors')
 const mongoose = require('mongoose');
 const Device = require('./models/device');
-
+const devices = require('./api/devices')
+const auth = require('./api/auth')
 mongoose.connect('mongodb+srv://admin:IW0BGph6eQOZRQLP@cluster0.unq25.mongodb.net/myFirstDatabase?retryWrites=true&w=majority');
 mongoose.Promise = global.Promise;
 
@@ -71,8 +71,8 @@ io.sockets.on('connection', function(socket) {
 
 
 // initialize routes
-app.use('/api',api);
-
+app.use('/api/devices',devices);
+app.use('/api/auth',auth);
 // API to control the device
 app.post('/control', (req,res)=>{
     var {name,port,command} = req.body;
