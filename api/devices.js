@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 
-
 const Device = require('../models/device');
 
 // List all devices in dashboard
@@ -24,7 +23,8 @@ const Device = require('../models/device');
     ]
 }
 */
-router.get('/devices',function(req,res,next){
+router.get('/',function(req,res,next){
+    
     Device.find({}).then(function(devices){
         res.send(devices);
     }).catch(next);
@@ -32,7 +32,7 @@ router.get('/devices',function(req,res,next){
 
 
 // Fetch a specific device data
-router.get('/devices/:name',function(req,res,next){
+router.get('/:name',function(req,res,next){
     Device.findOne({name:req.params.name}).then(function(devices){
         res.send(devices);
     }).catch(next);
@@ -60,7 +60,7 @@ Create a new device
 */
 
 
-router.post('/devices',function(req,res,next){
+router.post('/',function(req,res,next){
     Device.create(req.body).then(function(device){
         res.send(device);
     }).catch(next);
@@ -85,7 +85,7 @@ Update a device
     ]
 }
 */
-router.put('/devices/:name',function(req,res,next){
+router.put('/:name',function(req,res,next){
     Device.findOneAndUpdate({name: req.params.name},req.body).then(function(device){
         console.log(device);
         Device.findOne({_id: device._id}).then(function(device){
