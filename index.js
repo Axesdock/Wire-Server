@@ -106,12 +106,14 @@ app.post('/control', (req,res)=>{
             macSocketMapping[mac].emit('control',{port:port,command:command});
             portData = device.ports;
             for(var p in portData){
-                if(p.id == port)
+                console.log(p);
+                if(portData[p].id == port)
                 {
-                    p.status=command;
+                    portData[p].status=command;
                 }
             }
-            Device.findOneAndUpdate({name:name},{port:portData});
+            console.log(portData);
+            Device.findOneAndUpdate({name:name},{ports:portData}).then();
             res.send();
         }
     })
