@@ -393,12 +393,13 @@ function getCookie(cname) {
   return "";
 }
 
-function checkJWTCookie(address) {
+function checkJWTCookie() {
   let token = getCookie("token");
   if (token != "" && token != null) {
+    console.log("Token: "+token)
     let flag = tokenVerify(token);
     if (flag) {
-      window.location.href = address;
+      // window.location.href = address;
     }
     else {
       window.location.href = "./login.html?f=1";
@@ -430,6 +431,31 @@ function GetFailLogin() {
   }
 }
 
-function tokenVerify(token) {
-  // TODO
+async function tokenVerify(token) {
+  let url = 'http://localhost:4004/api/auth/verify'
+  const fetchOptions = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({'token': token}),
+  };
+
+  const response = await fetch(url, fetchOptions);
+
+  if (!response.ok) {
+    const errorMessage = await response.text();
+    throw new Error(errorMessage);
+  }
+  var x = response.json()
+  if (x == 'success'){
+    return true;
+  }
+  else return false;
+}
+
+function logout() {
+  document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+  window.location.href = "./login.html";
 }

@@ -340,7 +340,7 @@
 </script>
   <script>    
     window.onload = function fetchGetVariable() {
-
+      checkJWTCookie();
       var $_GET = {};
       if(document.location.toString().indexOf('?') !== -1) {
           var query = document.location

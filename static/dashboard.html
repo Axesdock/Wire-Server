@@ -198,7 +198,7 @@
                   <i class="ni ni-settings-gear-65"></i>
                   <span>Settings</span>
                 </a>
-                <a href="#!" class="dropdown-item">
+                <a href="#!" class="dropdown-item" onclick="logout()">
                   <i class="ni ni-user-run"></i>
                   <span>Logout</span>
                 </a>
@@ -488,6 +488,7 @@
 
   <script>
     window.onload = function exampleFunction() {
+      checkJWTCookie();
       renderStats();
       renderDevices();
       console.log('Rendered');
