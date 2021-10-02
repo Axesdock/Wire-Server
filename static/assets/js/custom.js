@@ -40,11 +40,24 @@ async function renderDevices() {
                           </td>`
       }
 
+      if(device.isRegistered){
+        devreg =  `  <td>
+                            <span class="badge badge-dot mr-4">
+                              <i class="bg-success"></i>
+                          </td>`
+      }
+      else {
+        devreg =  `
+                            <span class="badge badge-dot mr-4">
+                              <i class="bg-warning"></i>
+                          `
+      }
+
       let htmlSegment = ` <tr>
                             <th scope="row">
                               <div class="media align-items-center">
                                 <div class="media-body">
-                                  <span class="name mb-0 text-sm">${device.name}</span>
+                                  <span class="name mb-0 text-sm">${devreg} ${device.name}</span>
                                 </div>
                               </div>
                             </th>
@@ -53,7 +66,10 @@ async function renderDevices() {
                             </td>
                             ${divstatus}
                             <td>
-                              <a href="#" class="btn btn-sm btn-neutral ports">View</a>
+                              
+                              <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
+                                View
+                              </button>
                             </td>
                             <td>
                               <div class="d-flex align-items-center">
@@ -71,7 +87,26 @@ async function renderDevices() {
                                 </div>
                               </div>
                             </td>
-                          </tr>`;
+                          </tr>
+                          
+                          <!-- Modal -->
+                          <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                              <div class="modal-content">
+                                <div class="modal-header">
+                                  <h5 class="modal-title" id="exampleModalLabel">Ports</h5>
+                                </div>
+                                <div class="modal-body">
+                                  <strong>Port 1:</strong> ${device.ports[0]}<br><strong>Port 2:</strong> ${device.ports[1]}
+                                </div>
+                                <div class="modal-footer">
+                                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          `;
       html += htmlSegment;
 
   let container = document.querySelector('.device-table');
@@ -136,13 +171,13 @@ async function editDevice(id) {
                       <div class="col-lg-6">
                         <div class="form-group">
                           <label class="form-control-label" for="port1">Port 1</label>
-                          <input type="text" id="port1" name="port1" class="form-control" placeholder="Add Comment" value="${device.port1}">
+                          <input type="text" id="ports1" name="port1" class="form-control" placeholder="Add Comment" value="${device.ports[0]}">
                         </div>
                       </div>
                       <div class="col-lg-6">
                         <div class="form-group">
                           <label class="form-control-label" for="port2">Port 2</label>
-                          <input type="text" id="port2" name="port2" class="form-control" placeholder="Add Comment" value="${device.port2}">
+                          <input type="text" id="ports2" name="port2" class="form-control" placeholder="Add Comment" value="${device.ports[1]}">
                         </div>
                       </div>
                     </div>
@@ -268,3 +303,133 @@ async function renderStats() {
 }
 
 // dashboard stats ends
+
+
+//login starts
+async function login() {
+  let url = 'http://localhost:4004/api/auth/login';
+  try {
+      let res = await fetch(url);
+      return await res.json();
+  } catch (error) {
+      console.log(error);
+  }
+}
+
+async function userlogin() {
+
+  const deviceForm = document.getElementById("newDevice-form");
+  deviceForm.addEventListener("submit", handleFormSubmit);
+  console.log("EventListener Active.");
+}
+
+//login ends
+
+function renderLoginFail() {
+  let container = document.querySelector('.login-fail');
+  container.style.display = "block";
+}
+
+// POST requests in json format
+async function postFormDataAsJson({ url, formData }) {
+  const plainFormData = Object.fromEntries(formData.entries());
+  const formDataJsonString = JSON.stringify(plainFormData);
+
+  const fetchOptions = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: formDataJsonString,
+  };
+
+  const response = await fetch(url, fetchOptions);
+
+  if (!response.ok) {
+    const errorMessage = await response.text();
+    throw new Error(errorMessage);
+  }
+  return response.json();
+}
+
+// PUT requests in json format
+async function putFormDataAsJson({ url, formData }) {
+  const plainFormData = Object.fromEntries(formData.entries());
+  const formDataJsonString = JSON.stringify(plainFormData);
+
+  const fetchOptions = {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: formDataJsonString,
+  };
+
+  const response = await fetch(url, fetchOptions);
+
+  if (!response.ok) {
+    const errorMessage = await response.text();
+    throw new Error(errorMessage);
+  }
+
+  return response.json();
+}
+
+function getCookie(cname) {
+  let name = cname + "=";
+  let decodedCookie = decodeURIComponent(document.cookie);
+  let ca = decodedCookie.split(';');
+  for(let i = 0; i < ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) == ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return "";
+}
+
+function checkJWTCookie(address) {
+  let token = getCookie("token");
+  if (token != "" && token != null) {
+    let flag = tokenVerify(token);
+    if (flag) {
+      window.location.href = address;
+    }
+    else {
+      window.location.href = "./login.html?f=1";
+    }
+  } else {
+    window.location.href = "./login.html?f=1";
+  }
+}
+
+function GetFailLogin() {
+
+  var $_GET = {};
+  if(document.location.toString().indexOf('?') !== -1) {
+      var query = document.location
+                    .toString()
+                    // get the query string
+                    .replace(/^.*?\?/, '')
+                    // and remove any existing hash string (thanks, @vrijdenker)
+                    .replace(/#.*$/, '')
+                    .split('&');
+
+      for(var i=0, l=query.length; i<l; i++) {
+        var aux = decodeURIComponent(query[i]).split('=');
+        $_GET[aux[0]] = aux[1];
+      }
+  }
+  if($_GET['f']) {
+    renderLoginFail();
+  }
+}
+
+function tokenVerify(token) {
+  // TODO
+}

@@ -283,7 +283,7 @@
                   </div>
                 </div>
                 <div class="text-center">
-                  <button type="submit" class="btn btn-primary mt-4">Add Device</button>
+                  <button type="submit" class="btn btn-primary mt-4">Save Device</button>
                 </div>
               </form>
             </div>
@@ -314,42 +314,25 @@
   </div>
 
   <script>
-    async function postFormDataAsJson({ url, formData }) {
-    const plainFormData = Object.fromEntries(formData.entries());
-    const formDataJsonString = JSON.stringify(plainFormData);
 
-    const fetchOptions = {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      body: formDataJsonString,
-    };
-
-    const response = await fetch(url, fetchOptions);
-
-    if (!response.ok) {
-      const errorMessage = await response.text();
-      throw new Error(errorMessage);
-    }
-
-    return response.json();
-  }
 
   async function handleFormSubmit(event) {
     console.log("Submission triggered")
     event.preventDefault();
-
     const form = event.currentTarget;
     const url = form.action;
 
     try {
-      const formData = new FormData(form);
-      const responseData = await postFormDataAsJson({ url, formData });
+      // let proports = []
+      // proports.push(document.querySelector("#ports1").value)
+      // proports.push(document.querySelector("#ports2").value)
+      var formData = new FormData(form);
+      // formData.set('ports', document.querySelector("#ports1").value);
+      // formData.set('ports', document.querySelector("#ports2").value);
+      const responseData = await putFormDataAsJson({ url, formData });
 
       console.log({ responseData });
-      window.location.replace("./dashboard.html");
+      window.location.href = "./dashboard.html";
     } catch (error) {
       console.error(error);
     }
