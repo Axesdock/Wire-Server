@@ -35,22 +35,18 @@ async function renderDevices() {
         divstatus =  ` <td>
                             <span class="badge badge-dot mr-4">
                               <i class="bg-warning"></i>
-                              <span class="status">${device.status} Since: ${device.lastConnected}</span>
+                              <span class="status">${device.status} Since: ${device.lastDisconnected}</span>
                             </span>
                           </td>`
       }
 
       if(device.isRegistered){
-        devreg =  `  <td>
-                            <span class="badge badge-dot mr-4">
-                              <i class="bg-success"></i>
-                          </td>`
+        devreg =  `<span class="badge badge-dot mr-4">
+                      <i class="bg-success"></i> `
       }
       else {
-        devreg =  `
-                            <span class="badge badge-dot mr-4">
-                              <i class="bg-warning"></i>
-                          `
+        devreg =  `<span class="badge badge-dot mr-4">
+                   <i class="bg-warning"></i> `
       }
 
       let htmlSegment = ` <tr>
@@ -67,7 +63,7 @@ async function renderDevices() {
                             ${divstatus}
                             <td>
                               
-                              <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
+                              <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal${device.name}">
                                 View
                               </button>
                             </td>
@@ -90,14 +86,14 @@ async function renderDevices() {
                           </tr>
                           
                           <!-- Modal -->
-                          <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                          <div class="modal fade" id="myModal${device.name}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                             <div class="modal-dialog" role="document">
                               <div class="modal-content">
                                 <div class="modal-header">
                                   <h5 class="modal-title" id="exampleModalLabel">Ports</h5>
                                 </div>
                                 <div class="modal-body">
-                                  <strong>Port 1:</strong> ${device.ports[0]}<br><strong>Port 2:</strong> ${device.ports[1]}
+                                  <strong>Port 1:</strong> ${device.ports[0].comment}&nbsp; <strong>Status:</strong> ${device.ports[0].status}<br><strong>Port 2:</strong> ${device.ports[1].comment}&nbsp; <strong>Status:</strong> ${device.ports[1].status}
                                 </div>
                                 <div class="modal-footer">
                                   <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -135,7 +131,6 @@ async function getDevice(id) {
 async function editDevice(id) {
   let device = await getDevice(id);
   let html = '';
-    if(!device.isRegistered) {
 
       html = `   <form id="newDevice-form" action="http://localhost:4004/api/devices/${device.name}">
                   <h6 class="heading-small text-muted mb-4">Device Details</h6>
@@ -169,15 +164,15 @@ async function editDevice(id) {
                   <div class="pl-lg-4">
                     <div class="row">
                       <div class="col-lg-6">
-                        <div class="form-group">
+                        <div>
                           <label class="form-control-label" for="port1">Port 1</label>
-                          <input type="text" id="ports1" name="port1" class="form-control" placeholder="Add Comment" value="${device.ports[0]}">
+                          <input type="text" id="port1" name="port1" class="form-control" placeholder="Add Comment" value="${device.ports[0].comment}">
                         </div>
                       </div>
                       <div class="col-lg-6">
-                        <div class="form-group">
+                        <div>
                           <label class="form-control-label" for="port2">Port 2</label>
-                          <input type="text" id="ports2" name="port2" class="form-control" placeholder="Add Comment" value="${device.ports[1]}">
+                          <input type="text" id="port2" name="port2" class="form-control" placeholder="Add Comment" value="${device.ports[1].comment}">
                         </div>
                       </div>
                     </div>
@@ -191,11 +186,11 @@ async function editDevice(id) {
                       <textarea rows="4" class="form-control" placeholder="Add any Additional comment." name="comment" value="${device.comment}"></textarea>
                     </div>
                   </div>
+                  <input id="isRegistered" name="isRegistered" class="form-control" value="true" type="hidden">
                   <div class="text-center">
-                    <button type="submit" class="btn btn-primary mt-4">Add Device</button>
+                    <button type="submit" class="btn btn-primary mt-4">Save Device</button>
                   </div>
                 </form>`;
-    }
 
   let container = document.querySelector('.form-render');
   container.innerHTML = html;

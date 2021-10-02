@@ -12,11 +12,14 @@ const DeviceSchema = new Schema({
     installAddress:{
         type:String,
     },
-    ports:[{
+    ports:{
+        type:[{
         id:Number,
         comment:String,
         status:String
-    }],
+        }],
+        default:[{id:1,comment:"No comment",status:"OFF"},{id:2,comment:"No comment", status:"OFF"}]
+    },
     status:String,
     isRegistered:Boolean,
     lastConnected: Date,

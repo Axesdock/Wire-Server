@@ -88,6 +88,8 @@ Update a device
 
 
 router.put('/:name',function(req,res,next){
+    console.log(req.body);
+    req.body.ports = JSON.parse(req.body.ports);
     Device.findOneAndUpdate({name: req.params.name},req.body).then(function(device){
         console.log(device);
         Device.findOne({_id: device._id}).then(function(device){

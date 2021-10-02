@@ -323,11 +323,15 @@
     const url = form.action;
 
     try {
-      // let proports = []
+      let proports = [{id:1, comment: document.querySelector("#port1").value, status: 'OFF'},
+                      {id:2, comment: document.querySelector("#port2").value, status: 'OFF'}]
+
+      var jsonports = JSON.stringify(proports);
+      // var jsonports = proports;
       // proports.push(document.querySelector("#ports1").value)
       // proports.push(document.querySelector("#ports2").value)
       var formData = new FormData(form);
-      // formData.set('ports', document.querySelector("#ports1").value);
+      formData.set('ports', jsonports);
       // formData.set('ports', document.querySelector("#ports2").value);
       const responseData = await putFormDataAsJson({ url, formData });
 
