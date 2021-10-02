@@ -66,6 +66,24 @@ async function renderDevices() {
                               <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal${device.name}">
                                 View
                               </button>
+
+                              <!-- Modal -->
+                              <div class="modal fade" id="myModal${device.name}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                  <div class="modal-content">
+                                    <div class="modal-header">
+                                      <h5 class="modal-title" id="exampleModalLabel">Ports</h5>
+                                    </div>
+                                    <div class="modal-body ports">
+                                      <strong>Port 1:</strong> ${device.ports[0].comment}&nbsp; <strong>Status:</strong> ${device.ports[0].status}<br><strong>Port 2:</strong> ${device.ports[1].comment}&nbsp; <strong>Status:</strong> ${device.ports[1].status}
+                                    </div>
+                                    <div class="modal-footer">
+                                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+
                             </td>
                             <td>
                               <div class="d-flex align-items-center">
@@ -84,23 +102,7 @@ async function renderDevices() {
                               </div>
                             </td>
                           </tr>
-                          
-                          <!-- Modal -->
-                          <div class="modal fade" id="myModal${device.name}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                            <div class="modal-dialog" role="document">
-                              <div class="modal-content">
-                                <div class="modal-header">
-                                  <h5 class="modal-title" id="exampleModalLabel">Ports</h5>
-                                </div>
-                                <div class="modal-body">
-                                  <strong>Port 1:</strong> ${device.ports[0].comment}&nbsp; <strong>Status:</strong> ${device.ports[0].status}<br><strong>Port 2:</strong> ${device.ports[1].comment}&nbsp; <strong>Status:</strong> ${device.ports[1].status}
-                                </div>
-                                <div class="modal-footer">
-                                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
+                        
                           
                           `;
       html += htmlSegment;
