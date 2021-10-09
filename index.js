@@ -89,7 +89,43 @@ function originIsAllowed(origin) {
   // put logic here to detect whether the specified origin is allowed. 
   return true;
 }
- 
+
+function device_connect(connection, data)
+{
+    var mac= data.mac;
+    console.log("Connect msg from mac: ",mac)
+    macSocketMapping[mac] = connection;
+    Device.find({mac:mac}).then((device)=>{
+        console.log(device);
+        if(device.length == 0)
+        {
+            console.log("in");
+            Device.create({name:mac,mac:mac,isRegistered:false, status:'LIVE', lastConnected:Date.now()})
+        }else{
+            Device.findOneAndUpdate({mac:mac},{status:'LIVE', lastConnected:Date.now()}).then((d)=>{})
+        }
+    })
+}
+
+function closeConnection(connection)
+{
+    console.log('Got disconnect!');
+    var i = connectedDevicesSocket.indexOf(connection);
+    connectedDevicesSocket.splice(i, 1);
+    for(var mac in macSocketMapping)
+    {
+        if(connection == macSocketMapping[mac])
+        {
+            console.log("here!!")
+            console.log(mac);
+            Device.findOneAndUpdate({mac:mac},{status:'DEAD', lastDisconnected:Date.now()}).then((d)=>{});
+            delete macSocketMapping[mac];
+            return;
+        }
+    }
+}
+
+
 wsServer.on('request', function(request) {
 	
     if (!originIsAllowed(request.origin)) {
@@ -105,7 +141,11 @@ wsServer.on('request', function(request) {
 	connection.on('message', function(message) {
         if (message.type === 'utf8') {
             console.log('Received Message: ' + message.utf8Data);
-           // connection.sendUTF(message.utf8Data);
+            var data = JSON.parse(message.utf8Data);
+            if(data.event == 'connect')
+            {
+                device_connect(connection, data);
+            }
         }
         else if (message.type === 'binary') {
             console.log('Received Binary Message of ' + message.binaryData.length + ' bytes');
@@ -114,7 +154,7 @@ wsServer.on('request', function(request) {
     });
     
 	connection.on('close', function(reasonCode, description) {
-        console.log((new Date()) + ' Peer ' + connection.remoteAddress + ' disconnected.');
+        closeConnection(connection);
     });
 	
 	connection.sendUTF("Hallo Client!");
@@ -149,12 +189,16 @@ app.get('/api/stats',function(req,res,next){
 // API to control the device
 app.post('/control', (req,res)=>{
     var {name,port,command} = req.body;
+    console.log(req.body);
     Device.findOne({name:name}).then((device)=>{
         mac = device.mac;
+        // console.log("device"+device);
+        // console.log(mac)
         if(macSocketMapping[mac] == undefined){
             res.status(404).send({});
         }else{
-            macSocketMapping[mac].emit('control',{port:port,command:command});
+            var sendData = "{\"event\":\"control\",\"port\":"+port+",operation:\""+command+"\"}"
+            macSocketMapping[mac].sendUTF(sendData);
             portData = device.ports;
             for(var p in portData){
                 console.log(p);
