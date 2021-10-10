@@ -8,6 +8,10 @@ mongoose.connect('mongodb+srv://admin:IW0BGph6eQOZRQLP@cluster0.unq25.mongodb.ne
 mongoose.Promise = global.Promise;
 
 
+const httpport=4011;
+const wsport=8011;
+
+
 // set up our express app
 const app = express();
 app.use(cors());
@@ -24,64 +28,19 @@ var server = http2.createServer(function(request, response) {
     response.writeHead(404);
     response.end();
 });
-server.listen(8011, function() {
-    console.log((new Date()) + ' Server is listening on port 8011');
+server.listen(wsport, function() {
+    console.log('Websocket on port: '+wsport);
 });
  
-
 var connectedDevicesSocket = [];
 var macSocketMapping = {};
-
-// io.sockets.on('connection', function(socket) {
-//     connectedDevicesSocket.push(socket);
-//     console.log("Device Connected!!")
-//     socket.on('connect_device',function(data){
-//         if(data.mac == undefined) return;
-//         var mac= data.mac;
-//         console.log("Connect msg from mac: ",mac)
-//         macSocketMapping[mac] = socket;
-//         Device.find({mac:mac}).then((device)=>{
-//             console.log(device);
-//             if(device.length == 0)
-//             {
-//                 console.log("in");
-//                 Device.create({name:mac,mac:mac,isRegistered:false, status:'LIVE', lastConnected:Date.now()})
-//             }else{
-//                 Device.findOneAndUpdate({mac:mac},{status:'LIVE', lastConnected:Date.now()}).then((d)=>{})
-//             }
-//         })
-//     });
-
-//     socket.on('disconnect', function() {
-//         console.log('Got disconnect!');
-//         var i = connectedDevicesSocket.indexOf(socket);
-//         connectedDevicesSocket.splice(i, 1);
-//         for(var mac in macSocketMapping)
-//         {
-//             if(socket == macSocketMapping[mac])
-//             {
-//                 console.log("here!!")
-//                 console.log(mac);
-//                 Device.findOneAndUpdate({mac:mac},{status:'DEAD', lastDisconnected:Date.now()}).then((d)=>{});
-//                 delete macSocketMapping[mac];
-//                 return;
-//             }
-//         }
-//     });
-// });
-
  
- http.listen(4011, function() {
-    console.log('listening on *:3000');
+ http.listen(httpport, function() {
+    console.log('Dashboard and API on port:'+httpport);
  });
 
  wsServer = new WebSocketServer({
     httpServer: server,
-    // You should not use autoAcceptConnections for production 
-    // applications, as it defeats all standard cross-origin protection 
-    // facilities built into the protocol and the browser.  You should 
-    // *always* verify the connection's origin and decide whether or not 
-    // to accept it. 
     autoAcceptConnections: false
 });
  
@@ -129,7 +88,6 @@ function closeConnection(connection)
 wsServer.on('request', function(request) {
 	
     if (!originIsAllowed(request.origin)) {
-      // Make sure we only accept requests from an allowed origin 
       request.reject();
       console.log((new Date()) + ' Connection from origin ' + request.origin + ' rejected.');
       return;
