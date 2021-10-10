@@ -16,58 +16,149 @@ app.use(express.static('static'))
 
 // Socketio
 const http = require('http').Server(app);
-const io = require('socket.io')(http,{
-    cors: {
-      origin: "*",
-      methods: ["GET", "POST"]
-    }
-  });
+var WebSocketServer = require('websocket').server;
+var http2 = require('http');
+ 
+var server = http2.createServer(function(request, response) {
+    console.log((new Date()) + ' Received request for ' + request.url);
+    response.writeHead(404);
+    response.end();
+});
+server.listen(8011, function() {
+    console.log((new Date()) + ' Server is listening on port 8011');
+});
+ 
 
 var connectedDevicesSocket = [];
 var macSocketMapping = {};
 
-io.sockets.on('connection', function(socket) {
-    connectedDevicesSocket.push(socket);
-    console.log("Device Connected!!")
-    socket.on('connect_device',function(data){
-        if(data.mac == undefined) return;
-        var mac= data.mac;
-        console.log("Connect msg from mac: ",mac)
-        macSocketMapping[mac] = socket;
-        Device.find({mac:mac}).then((device)=>{
-            console.log(device);
-            if(device.length == 0)
-            {
-                console.log("in");
-                Device.create({name:mac,mac:mac,isRegistered:false, status:'LIVE', lastConnected:Date.now()})
-            }else{
-                Device.findOneAndUpdate({mac:mac},{status:'LIVE', lastConnected:Date.now()}).then((d)=>{})
-            }
-        })
-    });
+// io.sockets.on('connection', function(socket) {
+//     connectedDevicesSocket.push(socket);
+//     console.log("Device Connected!!")
+//     socket.on('connect_device',function(data){
+//         if(data.mac == undefined) return;
+//         var mac= data.mac;
+//         console.log("Connect msg from mac: ",mac)
+//         macSocketMapping[mac] = socket;
+//         Device.find({mac:mac}).then((device)=>{
+//             console.log(device);
+//             if(device.length == 0)
+//             {
+//                 console.log("in");
+//                 Device.create({name:mac,mac:mac,isRegistered:false, status:'LIVE', lastConnected:Date.now()})
+//             }else{
+//                 Device.findOneAndUpdate({mac:mac},{status:'LIVE', lastConnected:Date.now()}).then((d)=>{})
+//             }
+//         })
+//     });
 
-    socket.on('disconnect', function() {
-        console.log('Got disconnect!');
-        var i = connectedDevicesSocket.indexOf(socket);
-        connectedDevicesSocket.splice(i, 1);
-        for(var mac in macSocketMapping)
-        {
-            if(socket == macSocketMapping[mac])
-            {
-                console.log("here!!")
-                console.log(mac);
-                Device.findOneAndUpdate({mac:mac},{status:'DEAD', lastDisconnected:Date.now()}).then((d)=>{});
-                delete macSocketMapping[mac];
-                return;
-            }
-        }
-    });
-});
+//     socket.on('disconnect', function() {
+//         console.log('Got disconnect!');
+//         var i = connectedDevicesSocket.indexOf(socket);
+//         connectedDevicesSocket.splice(i, 1);
+//         for(var mac in macSocketMapping)
+//         {
+//             if(socket == macSocketMapping[mac])
+//             {
+//                 console.log("here!!")
+//                 console.log(mac);
+//                 Device.findOneAndUpdate({mac:mac},{status:'DEAD', lastDisconnected:Date.now()}).then((d)=>{});
+//                 delete macSocketMapping[mac];
+//                 return;
+//             }
+//         }
+//     });
+// });
 
  
  http.listen(4011, function() {
     console.log('listening on *:3000');
  });
+
+ wsServer = new WebSocketServer({
+    httpServer: server,
+    // You should not use autoAcceptConnections for production 
+    // applications, as it defeats all standard cross-origin protection 
+    // facilities built into the protocol and the browser.  You should 
+    // *always* verify the connection's origin and decide whether or not 
+    // to accept it. 
+    autoAcceptConnections: false
+});
+ 
+function originIsAllowed(origin) {
+  // put logic here to detect whether the specified origin is allowed. 
+  return true;
+}
+
+function device_connect(connection, data)
+{
+    var mac= data.mac;
+    console.log("Connect msg from mac: ",mac)
+    macSocketMapping[mac] = connection;
+    Device.find({mac:mac}).then((device)=>{
+        console.log(device);
+        if(device.length == 0)
+        {
+            console.log("in");
+            Device.create({name:mac,mac:mac,isRegistered:false, status:'LIVE', lastConnected:Date.now()})
+        }else{
+            Device.findOneAndUpdate({mac:mac},{status:'LIVE', lastConnected:Date.now()}).then((d)=>{})
+        }
+    })
+}
+
+function closeConnection(connection)
+{
+    console.log('Got disconnect!');
+    var i = connectedDevicesSocket.indexOf(connection);
+    connectedDevicesSocket.splice(i, 1);
+    for(var mac in macSocketMapping)
+    {
+        if(connection == macSocketMapping[mac])
+        {
+            console.log("here!!")
+            console.log(mac);
+            Device.findOneAndUpdate({mac:mac},{status:'DEAD', lastDisconnected:Date.now()}).then((d)=>{});
+            delete macSocketMapping[mac];
+            return;
+        }
+    }
+}
+
+
+wsServer.on('request', function(request) {
+	
+    if (!originIsAllowed(request.origin)) {
+      // Make sure we only accept requests from an allowed origin 
+      request.reject();
+      console.log((new Date()) + ' Connection from origin ' + request.origin + ' rejected.');
+      return;
+    }
+    
+    var connection = request.accept('arduino', request.origin);
+    console.log((new Date()) + ' Connection accepted.');
+    
+	connection.on('message', function(message) {
+        if (message.type === 'utf8') {
+            console.log('Received Message: ' + message.utf8Data);
+            var data = JSON.parse(message.utf8Data);
+            if(data.event == 'connect')
+            {
+                device_connect(connection, data);
+            }
+        }
+        else if (message.type === 'binary') {
+            console.log('Received Binary Message of ' + message.binaryData.length + ' bytes');
+           //connection.sendBytes(message.binaryData);
+        }
+    });
+    
+	connection.on('close', function(reasonCode, description) {
+        closeConnection(connection);
+    });
+	
+	connection.sendUTF("Hallo Client!");
+});
 
 
 // initialize routes
@@ -98,12 +189,16 @@ app.get('/api/stats',function(req,res,next){
 // API to control the device
 app.post('/control', (req,res)=>{
     var {name,port,command} = req.body;
+    console.log(req.body);
     Device.findOne({name:name}).then((device)=>{
         mac = device.mac;
+        // console.log("device"+device);
+        // console.log(mac)
         if(macSocketMapping[mac] == undefined){
             res.status(404).send({});
         }else{
-            macSocketMapping[mac].emit('control',{port:port,command:command});
+            var sendData = "{\"event\":\"control\",\"port\":"+port+",operation:\""+command+"\"}"
+            macSocketMapping[mac].sendUTF(sendData);
             portData = device.ports;
             for(var p in portData){
                 console.log(p);
