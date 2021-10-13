@@ -48,7 +48,9 @@ async function renderDevices() {
         devreg =  `<span class="badge badge-dot mr-4">
                    <i class="bg-warning"></i> `
       }
-
+      // <td class="macid">
+      // ${device.mac}
+      // </td>
       let htmlSegment = ` <tr>
                             <th scope="row">
                               <div class="media align-items-center">
@@ -57,9 +59,7 @@ async function renderDevices() {
                                 </div>
                               </div>
                             </th>
-                            <td class="macid">
-                            ${device.mac}
-                            </td>
+
                             ${divstatus}
                             <td>
                               
