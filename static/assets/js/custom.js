@@ -8,7 +8,7 @@
 
 // Render dashboard table starts
 async function getDevices() {
-  let url = 'http://localhost:4004/api/devices';
+  let url = '/api/devices';
   try {
       let res = await fetch(url);
       return await res.json();
@@ -121,7 +121,7 @@ async function renderDevices() {
 
 //edit devices starts
 async function getDevice(id) {
-  let url = 'http://localhost:4004/api/devices/'+id;
+  let url = '/api/devices/'+id;
   try {
       let res = await fetch(url);
       return await res.json();
@@ -134,7 +134,7 @@ async function editDevice(id) {
   let device = await getDevice(id);
   let html = '';
 
-      html = `   <form id="newDevice-form" action="http://localhost:4004/api/devices/${device.name}">
+      html = `   <form id="newDevice-form" action="/api/devices/${device.name}">
                   <h6 class="heading-small text-muted mb-4">Device Details</h6>
                   <div class="pl-lg-4">
                     <div class="row">
@@ -205,7 +205,7 @@ async function editDevice(id) {
 // dashboard stats starts
 
 async function getStats() {
-  let url = 'http://localhost:4004/api/stats/';
+  let url = '/api/stats/';
   try {
       let res = await fetch(url);
       return await res.json();
@@ -304,7 +304,7 @@ async function renderStats() {
 
 //login starts
 async function login() {
-  let url = 'http://localhost:4004/api/auth/login';
+  let url = '/api/auth/login';
   try {
       let res = await fetch(url);
       return await res.json();
@@ -429,7 +429,7 @@ function GetFailLogin() {
 }
 
 async function tokenVerify(token) {
-  let url = 'http://localhost:4004/api/auth/verify'
+  let url = '/api/auth/verify'
   const fetchOptions = {
     method: "POST",
     headers: {
