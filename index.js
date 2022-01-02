@@ -7,8 +7,8 @@ const auth = require('./api/auth')
 mongoose.connect('mongodb+srv://admin:IW0BGph6eQOZRQLP@cluster0.unq25.mongodb.net/myFirstDatabase?retryWrites=true&w=majority');
 mongoose.Promise = global.Promise;
 
-
-const httpport=4011;
+const PORT = process.env.PORT || 5000;
+const httpport=PORT;
 const wsport=8011;
 
 
